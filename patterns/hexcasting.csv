@@ -1,0 +1,170 @@
+variant,id,angles,direction,great,name,parse
+GulliversPurification,hexcasting:interop/pehkui/get,aawawwawwa,north_west,0,Gulliver's Purification,gulliver'spurification
+AlterScale,hexcasting:interop/pehkui/set,ddwdwwdwwd,north_east,0,Alter Scale,alterscale
+MindsReflection,hexcasting:get_caster,qaq,north_east,0,Mind's Reflection,mind'sreflection
+CompassPurification,hexcasting:entity_pos/eye,aa,east,0,Compass' Purification,compass'purification
+CompassPurificationII,hexcasting:entity_pos/foot,dd,north_east,0,Compass' Purification II,compass'purificationii
+AlidadesPurification,hexcasting:get_entity_look,wa,east,0,Alidade's Purification,alidade'spurification
+ArchersDistillation,hexcasting:raycast,wqaawdd,east,0,Archer's Distillation,archer'sdistillation
+ArchitectsDistillation,hexcasting:raycast/axis,weddwaa,east,0,Architect's Distillation,architect'sdistillation
+ScoutsDistillation,hexcasting:raycast/entity,weaqa,east,0,Scout's Distillation,scout'sdistillation
+Reveal,hexcasting:print,de,north_east,0,Reveal,reveal
+StadiometersPurification,hexcasting:get_entity_height,awq,north_east,0,Stadiometer's Purification,stadiometer'spurification
+PacePurification,hexcasting:get_entity_velocity,wq,east,0,Pace Purification,pacepurification
+AdditiveDistillation,hexcasting:add,waaw,north_east,0,Additive Distillation,additivedistillation
+SubtractiveDistillation,hexcasting:sub,wddw,north_west,0,Subtractive Distillation,subtractivedistillation
+MultiplicativeDistillation,hexcasting:mul,waqaw,south_east,0,Multiplicative Distillation,multiplicativedistillation
+DivisionDistillation,hexcasting:div,wdedw,north_east,0,Division Distillation,divisiondistillation
+LengthPurification,hexcasting:abs,wqaqw,north_east,0,Length Purification,lengthpurification
+PowerDistillation,hexcasting:pow,wedew,north_west,0,Power Distillation,powerdistillation
+FloorPurification,hexcasting:floor,ewq,east,0,Floor Purification,floorpurification
+CeilingPurification,hexcasting:ceil,qwe,east,0,Ceiling Purification,ceilingpurification
+VectorExaltation,hexcasting:construct_vec,eqqqqq,east,0,Vector Exaltation,vectorexaltation
+VectorDisintegration,hexcasting:deconstruct_vec,qeeeee,east,0,Vector Disintegration,vectordisintegration
+ModulusDistillation,hexcasting:modulo,addwaad,north_east,0,Modulus Distillation,modulusdistillation
+AxialPurification,hexcasting:coerce_axial,qqqqqaww,north_west,0,Axial Purification,axialpurification
+EntropyReflection,hexcasting:random,eqqq,north_west,0,Entropy Reflection,entropyreflection
+TrueReflection,hexcasting:const/true,aqae,south_east,0,True Reflection,truereflection
+FalseReflection,hexcasting:const/false,dedq,north_east,0,False Reflection,falsereflection
+NullaryReflection,hexcasting:const/null,d,east,0,Nullary Reflection,nullaryreflection
+VectorReflectionZero,hexcasting:const/vec/0,qqqqq,north_west,0,Vector Reflection Zero,vectorreflectionzero
+CirclesReflection,hexcasting:const/double/tau,eawae,north_west,0,Circle's Reflection,circle'sreflection
+ArcsReflection,hexcasting:const/double/pi,qdwdq,north_east,0,Arc's Reflection,arc'sreflection
+EulersReflection,hexcasting:const/double/e,aaq,east,0,Euler's Reflection,euler'sreflection
+JestersGambit,hexcasting:swap,aawdd,east,0,Jester's Gambit,jester'sgambit
+RotationGambit,hexcasting:rotate,aaeaa,east,0,Rotation Gambit,rotationgambit
+RotationGambitII,hexcasting:rotate_reverse,ddqdd,north_east,0,Rotation Gambit II,rotationgambitii
+GeminiDecomposition,hexcasting:duplicate,aadaa,east,0,Gemini Decomposition,geminidecomposition
+ProspectorsGambit,hexcasting:over,aaedd,east,0,Prospector's Gambit,prospector'sgambit
+UndertakersGambit,hexcasting:tuck,ddqaa,east,0,Undertaker's Gambit,undertaker'sgambit
+GeminiGambit,hexcasting:duplicate_n,aadaadaa,east,0,Gemini Gambit,geminigambit
+DioscuriGambit,hexcasting:2dup,aadadaaw,east,0,Dioscuri Gambit,dioscurigambit
+FlocksReflection,hexcasting:stack_len,qwaeawqaeaqa,north_west,0,Flock's Reflection,flock'sreflection
+FishermansGambit,hexcasting:fisherman,ddad,west,0,Fisherman's Gambit,fisherman'sgambit
+FishermansGambitII,hexcasting:fisherman/copy,aada,east,0,Fisherman's Gambit II,fisherman'sgambitii
+SwindlersGambit,hexcasting:swizzle,qaawdde,south_east,0,Swindler's Gambit,swindler'sgambit
+AugursPurification,hexcasting:bool_coerce,aw,north_east,0,Augur's Purification,augur'spurification
+LengthPurification,hexcasting:abs,wqaqw,north_east,0,Length Purification,lengthpurification
+NegationPurification,hexcasting:not,dw,north_west,0,Negation Purification,negationpurification
+DisjunctionDistillation,hexcasting:or,waw,south_east,0,Disjunction Distillation,disjunctiondistillation
+ConjunctionDistillation,hexcasting:and,wdw,north_east,0,Conjunction Distillation,conjunctiondistillation
+ExclusionDistillation,hexcasting:xor,dwa,north_west,0,Exclusion Distillation,exclusiondistillation
+AugursExaltation,hexcasting:if,awdd,south_east,0,Augur's Exaltation,augur'sexaltation
+EqualityDistillation,hexcasting:equals,ad,east,0,Equality Distillation,equalitydistillation
+InequalityDistillation,hexcasting:not_equals,da,east,0,Inequality Distillation,inequalitydistillation
+MaximusDistillation,hexcasting:greater,e,south_east,0,Maximus Distillation,maximusdistillation
+MinimusDistillation,hexcasting:less,q,south_west,0,Minimus Distillation,minimusdistillation
+MaximusDistillationII,hexcasting:greater_eq,ee,south_east,0,Maximus Distillation II,maximusdistillationii
+MinimusDistillationII,hexcasting:less_eq,qq,south_west,0,Minimus Distillation II,minimusdistillationii
+EntityPurification,hexcasting:get_entity,qqqqqdaqa,south_east,0,Entity Purification,entitypurification
+EntityPurificationAnimal,hexcasting:get_entity/animal,qqqqqdaqaawa,south_east,0,Entity Purification: Animal,entitypurification:animal
+EntityPurificationMonster,hexcasting:get_entity/monster,qqqqqdaqaawq,south_east,0,Entity Purification: Monster,entitypurification:monster
+EntityPurificationItem,hexcasting:get_entity/item,qqqqqdaqaaww,south_east,0,Entity Purification: Item,entitypurification:item
+EntityPurificationPlayer,hexcasting:get_entity/player,qqqqqdaqaawe,south_east,0,Entity Purification: Player,entitypurification:player
+EntityPurificationLiving,hexcasting:get_entity/living,qqqqqdaqaawd,south_east,0,Entity Purification: Living,entitypurification:living
+ZoneDistillationAnimal,hexcasting:zone_entity/animal,qqqqqwdeddwa,south_east,0,Zone Distillation: Animal,zonedistillation:animal
+ZoneDistillationNonAnimal,hexcasting:zone_entity/not_animal,eeeeewaqaawa,north_east,0,Zone Distillation: Non-Animal,zonedistillation:non-animal
+ZoneDistillationMonster,hexcasting:zone_entity/monster,qqqqqwdeddwq,south_east,0,Zone Distillation: Monster,zonedistillation:monster
+ZoneDistillationNonMonster,hexcasting:zone_entity/not_monster,eeeeewaqaawq,north_east,0,Zone Distillation: Non-Monster,zonedistillation:non-monster
+ZoneDistillationItem,hexcasting:zone_entity/item,qqqqqwdeddww,south_east,0,Zone Distillation: Item,zonedistillation:item
+ZoneDistillationNonItem,hexcasting:zone_entity/not_item,eeeeewaqaaww,north_east,0,Zone Distillation: Non-Item,zonedistillation:non-item
+ZoneDistillationPlayer,hexcasting:zone_entity/player,qqqqqwdeddwe,south_east,0,Zone Distillation: Player,zonedistillation:player
+ZoneDistillationNonPlayer,hexcasting:zone_entity/not_player,eeeeewaqaawe,north_east,0,Zone Distillation: Non-Player,zonedistillation:non-player
+ZoneDistillationLiving,hexcasting:zone_entity/living,qqqqqwdeddwd,south_east,0,Zone Distillation: Living,zonedistillation:living
+ZoneDistillationNonLiving,hexcasting:zone_entity/not_living,eeeeewaqaawd,north_east,0,Zone Distillation: Non-Living,zonedistillation:non-living
+ZoneDistillationAny,hexcasting:zone_entity,qqqqqwded,south_east,0,Zone Distillation: Any,zonedistillation:any
+SelectionDistillation,hexcasting:index,deeed,north_west,0,Selection Distillation,selectiondistillation
+SelectionExaltation,hexcasting:slice,qaeaqwded,north_west,0,Selection Exaltation,selectionexaltation
+IntegrationDistillation,hexcasting:append,edqde,south_west,0,Integration Distillation,integrationdistillation
+DerivationDistillation,hexcasting:unappend,qaeaq,north_west,0,Derivation Distillation,derivationdistillation
+AdditiveDistillation,hexcasting:add,waaw,north_east,0,Additive Distillation,additivedistillation
+VacantReflection,hexcasting:empty_list,qqaeaae,north_east,0,Vacant Reflection,vacantreflection
+SinglesPurification,hexcasting:singleton,adeeed,east,0,Single's Purification,single'spurification
+LengthPurification,hexcasting:abs,wqaqw,north_east,0,Length Purification,lengthpurification
+RetrogradePurification,hexcasting:reverse,qqqaede,east,0,Retrograde Purification,retrogradepurification
+LocatorsDistillation,hexcasting:index_of,dedqde,east,0,Locator's Distillation,locator'sdistillation
+ExcisorsDistillation,hexcasting:remove_from,edqdewaqa,south_west,0,Excisor's Distillation,excisor'sdistillation
+SurgeonsExaltation,hexcasting:replace,wqaeaqw,north_west,0,Surgeon's Exaltation,surgeon'sexaltation
+FlocksGambit,hexcasting:last_n_list,ewdqdwe,south_west,0,Flock's Gambit,flock'sgambit
+FlocksDisintegration,hexcasting:splat,qwaeawq,north_west,0,Flock's Disintegration,flock'sdisintegration
+SpeakersDistillation,hexcasting:construct,ddewedd,south_east,0,Speaker's Distillation,speaker'sdistillation
+SpeakersDecomposition,hexcasting:deconstruct,aaqwqaa,south_west,0,Speaker's Decomposition,speaker'sdecomposition
+ScribesReflection,hexcasting:read,aqqqqq,east,0,Scribe's Reflection,scribe'sreflection
+ScribesGambit,hexcasting:write,deeeee,east,0,Scribe's Gambit,scribe'sgambit
+ChroniclersPurification,hexcasting:read/entity,wawqwqwqwqwqw,east,0,Chronicler's Purification,chronicler'spurification
+ChroniclersGambit,hexcasting:write/entity,wdwewewewewew,east,0,Chronicler's Gambit,chronicler'sgambit
+AuditorsReflection,hexcasting:readable,aqqqqqe,east,0,Auditor's Reflection,auditor'sreflection
+AuditorsPurification,hexcasting:readable/entity,wawqwqwqwqwqwew,east,0,Auditor's Purification,auditor'spurification
+AssessorsReflection,hexcasting:writable,deeeeeq,east,0,Assessor's Reflection,assessor'sreflection
+AssessorsPurification,hexcasting:writable/entity,wdwewewewewewqw,east,0,Assessor's Purification,assessor'spurification
+HuginnsGambit,hexcasting:write/local,eqqwawqaaw,north_west,0,Huginn's Gambit,huginn'sgambit
+MuninnsReflection,hexcasting:read/local,qeewdweddw,north_east,0,Muninn's Reflection,muninn'sreflection
+SinePurification,hexcasting:sin,qqqqqaa,south_east,0,Sine Purification,sinepurification
+CosinePurification,hexcasting:cos,qqqqqad,south_east,0,Cosine Purification,cosinepurification
+TangentPurification,hexcasting:tan,wqqqqqadq,south_west,0,Tangent Purification,tangentpurification
+InverseSinePurification,hexcasting:arcsin,ddeeeee,south_east,0,Inverse Sine Purification,inversesinepurification
+InverseCosinePurification,hexcasting:arccos,adeeeee,north_east,0,Inverse Cosine Purification,inversecosinepurification
+InverseTangentPurification,hexcasting:arctan,eadeeeeew,north_east,0,Inverse Tangent Purification,inversetangentpurification
+InverseTangentPurificationII,hexcasting:arctan2,deadeeeeewd,west,0,Inverse Tangent Purification II,inversetangentpurificationii
+LogarithmicDistillation,hexcasting:logarithm,eqaqe,north_west,0,Logarithmic Distillation,logarithmicdistillation
+DisjunctionDistillation,hexcasting:or,waw,south_east,0,Disjunction Distillation,disjunctiondistillation
+ConjunctionDistillation,hexcasting:and,wdw,north_east,0,Conjunction Distillation,conjunctiondistillation
+ExclusionDistillation,hexcasting:xor,dwa,north_west,0,Exclusion Distillation,exclusiondistillation
+NegationPurification,hexcasting:not,dw,north_west,0,Negation Purification,negationpurification
+UniquenessPurification,hexcasting:unique,aweaqa,north_east,0,Uniqueness Purification,uniquenesspurification
+HermesGambit,hexcasting:eval,deaqq,south_east,0,Hermes' Gambit,hermes'gambit
+IrisGambit,hexcasting:eval/cc,qwaqde,north_west,0,Iris' Gambit,iris'gambit
+ThothsGambit,hexcasting:for_each,dadad,north_east,0,Thoth's Gambit,thoth'sgambit
+CharonsGambit,hexcasting:halt,aqdee,south_west,0,Charon's Gambit,charon'sgambit
+WaystoneReflection,hexcasting:circle/impetus_pos,eaqwqae,south_west,0,Waystone Reflection,waystonereflection
+LodestoneReflection,hexcasting:circle/impetus_dir,eaqwqaewede,south_west,0,Lodestone Reflection,lodestonereflection
+LesserFoldReflection,hexcasting:circle/bounds/min,eaqwqaewdd,south_west,0,Lesser Fold Reflection,lesserfoldreflection
+GreaterFoldReflection,hexcasting:circle/bounds/max,aqwqawaaqa,west,0,Greater Fold Reflection,greaterfoldreflection
+AkashasDistillation,hexcasting:akashic/read,qqqwqqqqqaq,west,0,Akasha's Distillation,akasha'sdistillation
+AkashasGambit,hexcasting:akashic/write,eeeweeeeede,east,0,Akasha's Gambit,akasha'sgambit
+Explosion,hexcasting:explode,aawaawaa,east,0,Explosion,explosion
+Fireball,hexcasting:explode/fire,ddwddwdd,east,0,Fireball,fireball
+Impulse,hexcasting:add_motion,awqqqwaqw,south_west,0,Impulse,impulse
+Blink,hexcasting:blink,awqqqwaq,south_west,0,Blink,blink
+MakeNote,hexcasting:beep,adaa,west,0,Make Note,makenote
+PlaceBlock,hexcasting:place_block,eeeeede,south_west,0,Place Block,placeblock
+BreakBlock,hexcasting:break_block,qaqqqqq,east,0,Break Block,breakblock
+CreateWater,hexcasting:create_water,aqawqadaq,south_east,0,Create Water,createwater
+DestroyLiquid,hexcasting:destroy_water,dedwedade,south_west,0,Destroy Liquid,destroyliquid
+ConjureBlock,hexcasting:conjure_block,qqa,north_east,0,Conjure Block,conjureblock
+ConjureLight,hexcasting:conjure_light,qqd,north_east,0,Conjure Light,conjurelight
+Overgrow,hexcasting:bonemeal,wqaqwawqaqw,north_east,0,Overgrow,overgrow
+EdifySapling,hexcasting:edify,wqaqwd,north_east,0,Edify Sapling,edifysapling
+IgniteBlock,hexcasting:ignite,aaqawawa,south_east,0,Ignite Block,igniteblock
+ExtinguishArea,hexcasting:extinguish,ddedwdwd,south_west,0,Extinguish Area,extinguisharea
+WhiteSunsNadir,hexcasting:potion/weakness,qqqqqaqwawaw,north_west,0,White Sun's Nadir,whitesun'snadir
+BlueSunsNadir,hexcasting:potion/levitation,qqqqqawwawawd,west,0,Blue Sun's Nadir,bluesun'snadir
+BlackSunsNadir,hexcasting:potion/wither,qqqqqaewawawe,south_west,0,Black Sun's Nadir,blacksun'snadir
+RedSunsNadir,hexcasting:potion/poison,qqqqqadwawaww,south_east,0,Red Sun's Nadir,redsun'snadir
+GreenSunsNadir,hexcasting:potion/slowness,qqqqqadwawaw,south_east,0,Green Sun's Nadir,greensun'snadir
+CraftCypher,hexcasting:craft/cypher,waqqqqq,east,0,Craft Cypher,craftcypher
+CraftTrinket,hexcasting:craft/trinket,wwaqqqqqeaqeaeqqqeaeq,east,0,Craft Trinket,crafttrinket
+CraftArtifact,hexcasting:craft/artifact,wwaqqqqqeawqwqwqwqwqwwqqeadaeqqeqqeadaeqq,east,0,Craft Artifact,craftartifact
+RechargeItem,hexcasting:recharge,qqqqqwaeaeaeaeaea,north_west,0,Recharge Item,rechargeitem
+EraseItem,hexcasting:erase,qdqawwaww,east,0,Erase Item,eraseitem
+SummonSentinel,hexcasting:sentinel/create,waeawae,east,0,Summon Sentinel,summonsentinel
+BanishSentinel,hexcasting:sentinel/destroy,qdwdqdw,north_east,0,Banish Sentinel,banishsentinel
+LocateSentinel,hexcasting:sentinel/get_pos,waeawaede,east,0,Locate Sentinel,locatesentinel
+WayfindSentinel,hexcasting:sentinel/wayfind,waeawaedwa,east,0,Wayfind Sentinel,wayfindsentinel
+InternalizePigment,hexcasting:colorize,awddwqawqwawq,east,0,Internalize Pigment,internalizepigment
+AnchoritesFlight,hexcasting:flight/range,awawaawq,south_west,0,Anchorite's Flight,anchorite'sflight
+WayfarersFlight,hexcasting:flight/time,dwdwdewq,north_east,0,Wayfarer's Flight,wayfarer'sflight
+CreateLava,hexcasting:create_lava,eaqawqadaqd,east,1,Create Lava,createlava
+SummonLightning,hexcasting:lightning,waadwawdaaweewq,east,1,Summon Lightning,summonlightning
+SummonRain,hexcasting:summon_rain,wwweeewwweewdawdwad,west,1,Summon Rain,summonrain
+DispelRain,hexcasting:dispel_rain,eeewwweeewwaqqddqdqd,east,1,Dispel Rain,dispelrain
+Altiora,hexcasting:flight,eawwaeawawaa,north_west,1,Altiora,altiora
+GreaterTeleport,hexcasting:teleport/great,wwwqqqwwwqqeqqwwwqqwqqdqqqqqdqq,east,1,Greater Teleport,greaterteleport
+WhiteSunsZenith,hexcasting:potion/regeneration,qqqqaawawaedd,north_west,1,White Sun's Zenith,whitesun'szenith
+BlueSunsZenith,hexcasting:potion/night_vision,qqqaawawaeqdd,west,1,Blue Sun's Zenith,bluesun'szenith
+BlackSunsZenith,hexcasting:potion/absorption,qqaawawaeqqdd,south_west,1,Black Sun's Zenith,blacksun'szenith
+RedSunsZenith,hexcasting:potion/haste,qaawawaeqqqdd,south_east,1,Red Sun's Zenith,redsun'szenith
+GreenSunsZenith,hexcasting:potion/strength,aawawaeqqqqdd,east,1,Green Sun's Zenith,greensun'szenith
+SummonGreaterSentinel,hexcasting:sentinel/create/great,waeawaeqqqwqwqqwq,east,1,Summon Greater Sentinel,summongreatersentinel
+CraftPhial,hexcasting:craft/battery,aqqqaqwwaqqqqqeqaqqqawwqwqwqwqwqw,south_west,1,Craft Phial,craftphial
+FlayMind,hexcasting:brainsweep,qeqwqwqwqwqeqaeqeaqeqaeqaqded,north_east,1,Flay Mind,flaymind

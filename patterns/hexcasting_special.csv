@@ -1,0 +1,11 @@
+variant,id,angles,direction,great,name,parse
+VectorReflectionPX,hexcasting:const/vec/px,qqqqqea,north_west,0,Vector Reflection +X,vectorreflection+x
+VectorReflectionPY,hexcasting:const/vec/py,qqqqqew,north_west,0,Vector Reflection +Y,vectorreflection+y
+VectorReflectionPZ,hexcasting:const/vec/pz,qqqqqed,north_west,0,Vector Reflection +Z,vectorreflection+z
+VectorReflectionNX,hexcasting:const/vec/nx,eeeeeqa,south_west,0,Vector Reflection -X,vectorreflection-x
+VectorReflectionNY,hexcasting:const/vec/ny,eeeeeqw,south_west,0,Vector Reflection -Y,vectorreflection-y
+VectorReflectionNZ,hexcasting:const/vec/nz,eeeeeqd,south_west,0,Vector Reflection -Z,vectorreflection-z
+Consideration,hexcasting:escape,qqqaw,west,0,Consideration,consideration
+Introspection,hexcasting:open_paren,qqq,west,0,Introspection,introspection
+Retrospection,hexcasting:close_paren,eee,east,0,Retrospection,retrospection
+Evanition,hexcasting:undo,eeedw,east,0,Evanition,evanition
