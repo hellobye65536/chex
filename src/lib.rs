@@ -12,9 +12,11 @@ use bitvec::vec::BitVec;
 use diagnostics::Diagnostic;
 use ustr::Ustr;
 
+// pub mod ast;
 pub mod diagnostics;
 pub mod iota;
 pub mod ir;
+pub mod parse;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Symbol(Ustr);
