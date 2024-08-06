@@ -2,6 +2,7 @@ use std::fmt::Display;
 
 use crate::Span;
 
+#[must_use]
 #[derive(Debug)]
 pub struct Diagnostic {
     pub severity: Severity,

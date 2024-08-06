@@ -83,17 +83,17 @@ impl From<Span> for Range<usize> {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct WithSpan<T> {
-    pub val: T,
-    pub span: Span,
-}
+// #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+// pub struct WithSpan<T> {
+//     pub val: T,
+//     pub span: Span,
+// }
 
-impl<T> WithSpan<T> {
-    pub fn new(val: T, span: Span) -> Self {
-        Self { val, span }
-    }
-}
+// impl<T> WithSpan<T> {
+//     pub fn new(val: T, span: Span) -> Self {
+//         Self { val, span }
+//     }
+// }
 
 #[derive(Debug)]
 pub struct Context {

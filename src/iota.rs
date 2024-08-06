@@ -12,6 +12,12 @@ macro_rules! pattern {
     (NumericalReflection: $num:expr) => {
         $crate::iota::Pattern::Complex($crate::iota::ComplexPattern::NumericalReflection($num))
     };
+    (HexPattern ($dir:expr, $angles:expr)) => {
+        $crate::iota::Pattern::Complex($crate::iota::ComplexPattern::Other {
+            dir: $dir,
+            angles: $angles,
+        })
+    };
     ($ident:ident) => {
         $crate::iota::Pattern::Simple($crate::iota::SimplePattern::$ident)
     };

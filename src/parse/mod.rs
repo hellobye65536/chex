@@ -1,41 +1,52 @@
 use crate::Span;
 
+pub mod ast;
 pub mod iota;
-pub mod ir;
 
 #[derive(Debug)]
 pub struct Lexer<'lex, 'str, Token> {
     strlex: &'lex mut StrLex<'str>,
-    peek: Option<LexResult<Token>>,
+    span: Span,
+    peek: Option<Result<Token, ParseError>>,
 }
+
+pub type ParseResult<T> = Option<Result<T, ParseError>>;
 
 impl<'lex, 'str, Token> Lexer<'lex, 'str, Token> {
     pub fn new(strlex: &'lex mut StrLex<'str>) -> Self {
-        Self { strlex, peek: None }
+        let pos = strlex.pos();
+        Self {
+            strlex,
+            span: (pos..pos).into(),
+            peek: None,
+        }
+    }
+
+    pub fn peek<F>(&mut self, lex_fn: F) -> ParseResult<&Token>
+    where
+        F: FnOnce(&mut StrLex<'str>) -> Option<LexResult<Token>>,
+    {
+        self.peek = self.peek.take().or_else(|| {
+            if let Some(res) = lex_fn(self.strlex) {
+                self.span = res.span;
+                Some(res.token)
+            } else {
+                let pos = self.strlex.pos();
+                self.span = (pos..pos).into();
+                None
+            }
+        });
+        self.peek
+            .as_ref()
+            .map(|v| v.as_ref().map_err(|_| ParseError))
+    }
+
+    pub fn take(&mut self) -> ParseResult<Token> {
+        self.peek.take()
     }
 
     pub fn span(&self) -> Span {
-        self.peek.as_ref().unwrap().span
-    }
-
-    pub fn peek<F>(&mut self, lex_fn: F) -> Option<Result<&Token, ParseError>>
-    where
-        F: FnOnce(&mut StrLex<'str>) -> Option<LexResult<Token>>,
-    {
-        self.peek = self.peek.take().or_else(|| lex_fn(self.strlex));
-        self.peek
-            .as_ref()
-            .map(|res| res.token.as_ref().map_err(|v| *v))
-    }
-
-    pub fn next<F>(&mut self, lex_fn: F) -> Option<Result<Token, ParseError>>
-    where
-        F: FnOnce(&mut StrLex<'str>) -> Option<LexResult<Token>>,
-    {
-        self.peek
-            .take()
-            .or_else(|| lex_fn(self.strlex))
-            .map(|v| v.token)
+        self.span
     }
 
     // pub fn skip_while<F, P>(&mut self, lex: F, mut pred: P)
@@ -51,35 +62,8 @@ impl<'lex, 'str, Token> Lexer<'lex, 'str, Token> {
     }
 
     pub fn transform<Token2>(&mut self) -> Lexer<'_, 'str, Token2> {
-        debug_assert!(self.peek.is_none());
-        Lexer {
-            strlex: self.strlex,
-            peek: None,
-        }
+        Lexer::new(self.inner())
     }
-
-    // pub fn with_transformed<T, F, R>(&mut self, f: F) -> R
-    // where
-    //     T: TryFrom<Token, Error = LexError>,
-    //     Token: TryFrom<T, Error = LexError>,
-    //     F: FnOnce(&mut Lexer<'_, 'str, T>) -> R,
-    // {
-    //     let mut sublex = Lexer {
-    //         lex: self.lex,
-    //         peek: self
-    //             .peek
-    //             .take()
-    //             .map(|res| LexResult::new(res.span, res.token.and_then(T::try_from))),
-    //     };
-
-    //     let ret = f(&mut sublex);
-
-    //     self.peek = sublex
-    //         .peek
-    //         .map(|res| LexResult::new(res.span, res.token.and_then(Token::try_from)));
-
-    //     ret
-    // }
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -99,21 +83,14 @@ impl<Token> LexResult<Token> {
         }
     }
 
-    pub fn new_token<T>(span: T, token: Token) -> Self
-    where
-        Span: From<T>,
-    {
+    pub fn new_token(span: impl Into<Span>, token: Token) -> Self {
         Self::new(span, Ok(token))
     }
 
-    pub fn new_error<T>(span: T) -> Self
-    where
-        Span: From<T>,
-    {
+    pub fn new_error(span: impl Into<Span>) -> Self {
         Self::new(span, Err(ParseError))
     }
 }
-
 
 #[derive(Debug, Clone)]
 pub struct StrLex<'str> {
