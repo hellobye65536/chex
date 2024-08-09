@@ -1,4 +1,4 @@
-use std::fmt::Display;
+use std::{borrow::Cow, fmt::Display};
 
 use crate::Span;
 
@@ -12,10 +12,10 @@ pub struct Diagnostic {
 }
 
 impl Diagnostic {
-    pub fn new(severity: Severity, message: impl Display, span: impl Into<Span>) -> Self {
+    pub fn new(severity: Severity, message: String, span: impl Into<Span>) -> Self {
         Self {
             severity,
-            message: message.to_string(),
+            message,
             span: span.into(),
             tags: Vec::new(),
         }
@@ -30,6 +30,16 @@ impl Diagnostic {
         self.tags.extend(tags);
         self
     }
+
+    pub fn with_primary_tag(self, message: Option<String>) -> Self {
+        let tag = Tag::new(
+            self.severity,
+            message.unwrap_or_else(|| self.message.clone()),
+            self.span,
+        );
+
+        self.tag(tag)
+    }
 }
 
 #[derive(Debug)]
@@ -40,10 +50,10 @@ pub struct Tag {
 }
 
 impl Tag {
-    pub fn new(severity: Severity, message: impl Display, span: impl Into<Span>) -> Self {
+    pub fn new(severity: Severity, message: String, span: impl Into<Span>) -> Self {
         Self {
             severity,
-            message: message.to_string(),
+            message,
             span: span.into(),
         }
     }

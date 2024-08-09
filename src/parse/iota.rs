@@ -177,7 +177,7 @@ impl<'lex, 'str> Lexer<'lex, 'str> {
         self.0.span()
     }
 
-    pub fn make_diagnostic(&mut self, expected: impl Display + Clone) -> Diagnostic {
+    pub fn make_diagnostic(&mut self, expected: String) -> Diagnostic {
         let peek = &self.0.peek.as_ref();
         let peek_str = peek.map_or("eof", |peek| {
             peek.as_ref().map_or("invalid token", Token::display_type)
@@ -185,10 +185,10 @@ impl<'lex, 'str> Lexer<'lex, 'str> {
 
         Diagnostic::new(
             Severity::Error,
-            format_args!("{}, got {}", expected.clone(), peek_str),
+            format!("{}, got {}", expected, peek_str),
             self.span(),
         )
-        .tag(Tag::new(Severity::Error, expected, self.span()))
+        .with_primary_tag(Some(expected))
     }
 }
 
@@ -216,14 +216,14 @@ fn expect_closing(ctx: &mut Context, lex: &mut Lexer, right: &Token) -> ParseRes
                 lex.take();
                 if err {
                     ctx.emit_diagnostic(
-                        lex.make_diagnostic(format_args!("expected {}", right.display_type())),
+                        lex.make_diagnostic(format!("expected {}", right.display_type())),
                     );
                     return Some(Err(ParseError));
                 }
                 return Some(Ok(()));
             } else if let Some(matching) = tok.left_matching() {
                 ctx.emit_diagnostic(
-                    lex.make_diagnostic(format_args!("expected {}", right.display_type())),
+                    lex.make_diagnostic(format!("expected {}", right.display_type())),
                 );
                 return None;
             } else if let Some(matching) = tok.right_matching() {
@@ -240,11 +240,11 @@ fn expect_closing(ctx: &mut Context, lex: &mut Lexer, right: &Token) -> ParseRes
 }
 
 pub fn parse(ctx: &mut Context, strlex: &mut StrLex, closing: &Token) -> ParseResult<Iota> {
-    let mut lex = Lexer(super::Lexer::new(strlex));
+    let mut lex = &mut Lexer(super::Lexer::new(strlex));
 
-    let iota = parse_iota(ctx, &mut lex);
+    let iota = parse_iota(ctx, lex);
 
-    expect_closing(ctx, &mut lex, closing).map(|v| v.and_then(|_| iota.unwrap_or(Err(ParseError))))
+    expect_closing(ctx, lex, closing).map(|v| v.and_then(|_| iota.unwrap_or(Err(ParseError))))
 }
 
 fn parse_iota(ctx: &mut Context, lex: &mut Lexer) -> ParseResult<Iota> {
@@ -269,7 +269,7 @@ fn parse_iota(ctx: &mut Context, lex: &mut Lexer) -> ParseResult<Iota> {
         tok => {
             let ret = tok.map(|_| Err(ParseError));
 
-            ctx.emit_diagnostic(lex.make_diagnostic("expected iota expression"));
+            ctx.emit_diagnostic(lex.make_diagnostic("expected iota expression".to_owned()));
 
             while !matches!(lex.peek(), Some(Ok(Token::Sep))) {
                 munch_group(ctx, lex)?;
@@ -303,7 +303,7 @@ fn parse_list(ctx: &mut Context, lex: &mut Lexer, closing: &Token) -> ParseResul
             }
             Some(_) => {
                 ctx.emit_diagnostic(
-                    lex.make_diagnostic(format_args!("expected `,` or {}", closing.display_type())),
+                    lex.make_diagnostic(format!("expected `,` or {}", closing.display_type())),
                 );
                 while !matches!(lex.peek(), Some(Ok(Token::Sep))) {
                     munch_group(ctx, lex)?;
@@ -325,7 +325,7 @@ fn parse_vec(ctx: &mut Context, lex: &mut Lexer) -> ParseResult<Iota> {
             }
         }
 
-        ctx.emit_diagnostic(lex.make_diagnostic("expected number"));
+        ctx.emit_diagnostic(lex.make_diagnostic("expected number".to_owned()));
 
         while !matches!(lex.peek(), Some(Ok(Token::Sep))) {
             munch_group(ctx, lex)?;
@@ -338,7 +338,7 @@ fn parse_vec(ctx: &mut Context, lex: &mut Lexer) -> ParseResult<Iota> {
             lex.take();
             Ok(())
         } else {
-            ctx.emit_diagnostic(lex.make_diagnostic("expected `,`"));
+            ctx.emit_diagnostic(lex.make_diagnostic("expected `,`".into()));
 
             while !matches!(lex.peek(), Some(Ok(Token::Sep))) {
                 munch_group(ctx, lex)?;
@@ -367,7 +367,7 @@ fn parse_vec(ctx: &mut Context, lex: &mut Lexer) -> ParseResult<Iota> {
     })();
 
     if iota.is_none() {
-        ctx.emit_diagnostic(lex.make_diagnostic("expected rest of vector expression"));
+        ctx.emit_diagnostic(lex.make_diagnostic("expected rest of vector expression".to_owned()));
     }
 
     expect_closing(ctx, lex, &Token::RParen)
@@ -451,11 +451,8 @@ fn parse_pattern(ctx: &mut Context, lex: &mut Lexer, pat: &str) -> ParseResult<I
         Some(Ok(Iota::Pattern(Pattern::Simple(pat))))
     } else {
         ctx.emit_diagnostic(
-            Diagnostic::new(Severity::Error, "expected valid pattern", span).tag(Tag::new(
-                Severity::Error,
-                "expected valid pattern",
-                span,
-            )),
+            Diagnostic::new(Severity::Error, "expected valid pattern".to_owned(), span)
+                .with_primary_tag(None),
         );
         Some(Err(ParseError))
     }
@@ -473,7 +470,7 @@ fn update_fst_state<'fst>(
 
 fn parse_hexpattern(ctx: &mut Context, lex: &mut Lexer) -> ParseResult<Iota> {
     if !matches!(lex.peek(), Some(Ok(Token::LParen))) {
-        ctx.emit_diagnostic(lex.make_diagnostic("expected `(`"));
+        ctx.emit_diagnostic(lex.make_diagnostic("expected `(`".to_owned()));
         return Some(Err(ParseError));
     }
     lex.take();
@@ -484,12 +481,16 @@ fn parse_hexpattern(ctx: &mut Context, lex: &mut Lexer) -> ParseResult<Iota> {
                 lex.take();
                 parse_direction(dir)
                     .tap_none(|| {
-                        ctx.emit_diagnostic(lex.make_diagnostic("expected valid direction"))
+                        ctx.emit_diagnostic(
+                            lex.make_diagnostic("expected valid direction".to_owned()),
+                        )
                     })
                     .ok_or(ParseError)
             }
             _ => {
-                ctx.emit_diagnostic(lex.make_diagnostic("expected direction and angles"));
+                ctx.emit_diagnostic(
+                    lex.make_diagnostic("expected direction and angles".to_owned()),
+                );
                 munch_group(ctx, lex)?;
                 Err(ParseError)
             }
@@ -499,11 +500,13 @@ fn parse_hexpattern(ctx: &mut Context, lex: &mut Lexer) -> ParseResult<Iota> {
             Ok(&Token::Symbol(angles)) => {
                 lex.take();
                 bytes_as_angles(angles.as_bytes())
-                    .tap_none(|| ctx.emit_diagnostic(lex.make_diagnostic("expected angles")))
+                    .tap_none(|| {
+                        ctx.emit_diagnostic(lex.make_diagnostic("expected angles".to_owned()))
+                    })
                     .ok_or(ParseError)
             }
             _ => {
-                ctx.emit_diagnostic(lex.make_diagnostic("expected angles"));
+                ctx.emit_diagnostic(lex.make_diagnostic("expected angles".to_owned()));
                 munch_group(ctx, lex)?;
                 Err(ParseError)
             }
@@ -518,7 +521,9 @@ fn parse_hexpattern(ctx: &mut Context, lex: &mut Lexer) -> ParseResult<Iota> {
     })();
 
     if iota.is_none() {
-        ctx.emit_diagnostic(lex.make_diagnostic("expected rest of hexpattern expression"));
+        ctx.emit_diagnostic(
+            lex.make_diagnostic("expected rest of hexpattern expression".to_owned()),
+        );
     }
 
     expect_closing(ctx, lex, &Token::RParen)
@@ -528,7 +533,7 @@ fn parse_hexpattern(ctx: &mut Context, lex: &mut Lexer) -> ParseResult<Iota> {
 
 fn parse_numerical_reflection(ctx: &mut Context, lex: &mut Lexer) -> ParseResult<Iota> {
     if !matches!(lex.peek(), Some(Ok(Token::Colon))) {
-        ctx.emit_diagnostic(lex.make_diagnostic("expected `:`"));
+        ctx.emit_diagnostic(lex.make_diagnostic("expected `:`".to_owned()));
         return Some(Err(ParseError));
     }
     lex.take();
@@ -544,7 +549,7 @@ fn parse_numerical_reflection(ctx: &mut Context, lex: &mut Lexer) -> ParseResult
 
     let ret = tok.map(|_| Err(ParseError));
     let do_skip = matches!(tok, Some(Ok(Token::Symbol(_)) | Err(ParseError)));
-    ctx.emit_diagnostic(lex.make_diagnostic("expected number"));
+    ctx.emit_diagnostic(lex.make_diagnostic("expected number".to_owned()));
     if do_skip {
         lex.take();
     }
@@ -553,7 +558,7 @@ fn parse_numerical_reflection(ctx: &mut Context, lex: &mut Lexer) -> ParseResult
 
 fn parse_bookkeepers_gambit(ctx: &mut Context, lex: &mut Lexer) -> ParseResult<Iota> {
     if !matches!(lex.peek(), Some(Ok(Token::Colon))) {
-        ctx.emit_diagnostic(lex.make_diagnostic("expected `:`"));
+        ctx.emit_diagnostic(lex.make_diagnostic("expected `:`".to_owned()));
         return Some(Err(ParseError));
     }
     lex.take();
@@ -581,7 +586,7 @@ fn parse_bookkeepers_gambit(ctx: &mut Context, lex: &mut Lexer) -> ParseResult<I
 
     let ret = tok.map(|_| Err(ParseError));
     let do_skip = matches!(tok, Some(Ok(Token::Symbol(_)) | Err(ParseError)));
-    ctx.emit_diagnostic(lex.make_diagnostic("expected bookkeepers spec"));
+    ctx.emit_diagnostic(lex.make_diagnostic("expected bookkeepers spec".to_owned()));
     if do_skip {
         lex.take();
     }
