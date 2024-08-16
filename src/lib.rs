@@ -12,7 +12,7 @@ use bitvec::vec::BitVec;
 use diagnostics::Diagnostic;
 use ustr::Ustr;
 
-// pub mod ast;
+pub mod ast;
 pub mod diagnostics;
 pub mod iota;
 pub mod ir;
@@ -20,6 +20,12 @@ pub mod parse;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Symbol(Ustr);
+
+impl From<&str> for Symbol {
+    fn from(v: &str) -> Self {
+        Self(v.into())
+    }
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Span {
@@ -82,18 +88,6 @@ impl From<Span> for Range<usize> {
         v.start..v.end
     }
 }
-
-// #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-// pub struct WithSpan<T> {
-//     pub val: T,
-//     pub span: Span,
-// }
-
-// impl<T> WithSpan<T> {
-//     pub fn new(val: T, span: Span) -> Self {
-//         Self { val, span }
-//     }
-// }
 
 #[derive(Debug)]
 pub struct Context {
