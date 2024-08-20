@@ -209,6 +209,29 @@ fn lex_default<'str>(strlex: &mut StrLex<'str>) -> Option<LexResult<Token<'str>>
             let operator = &strlex.str()[start..strlex.pos()];
             strlex.make_token(start, Token::Operator(operator))
         }
+        '0'..='9' => 'num: {
+            strlex.skip_while(|c| c.is_ascii_digit());
+            if let Some('.') = strlex.peek() {
+                strlex.next();
+                strlex.skip_while(|c| c.is_ascii_digit());
+            }
+
+            if let Some('e' | 'E') = strlex.peek() {
+                strlex.next();
+                if let Some('-' | '+') = strlex.peek() {
+                    strlex.next();
+                }
+
+                if !strlex.peek().is_some_and(|c| c.is_ascii_digit()) {
+                    break 'num strlex.make_error(start);
+                }
+
+                strlex.skip_while(|c| c.is_ascii_digit());
+            }
+
+            let num = &strlex.str()[start..strlex.pos()];
+            strlex.make_result(start, num.parse().map(Token::Num).map_err(|_| ParseError))
+        }
         _ => {
             strlex.skip_while(|c| !is_token_sep(c));
             strlex.make_error(start)
@@ -260,7 +283,7 @@ fn expect_semi_ext(
             continue;
         };
 
-        if early_return(&tok) {
+        if early_return(tok) {
             return Some(Err(ParseError));
         }
 
@@ -478,6 +501,7 @@ fn parse_expr_op(ctx: &mut Context, lex: &mut Lexer) -> ParseResult<Expr> {
     loop {
         let elem = match lex.peek() {
             Some(Ok(&Token::Operator(op))) => {
+                lex.take();
                 span += lex.span();
                 Ok(OpElem::Op(Ident {
                     symbol: op.into(),
@@ -726,16 +750,16 @@ mod tests {
         let mut ctx = Context::new();
 
         let str = "
-            def abcd = block (arg1, arg2, ) {  return arg1; };
+            def abcd = block (arg1, arg2, ) { 1 + 2; return arg1; };
         ";
 
         let mut strlex = StrLex::new(str);
 
-//         let mut lex = super::Lexer(Lexer::new(&mut strlex));
+        // let mut lex = super::Lexer(Lexer::new(&mut strlex));
 
-//         while lex.peek_closing().is_some() {
-//             dbg!(lex.take());
-//         }
+        // while lex.peek_closing().is_some() {
+        //     dbg!(lex.take());
+        // }
 
         let parse = super::parse(&mut ctx, &mut strlex);
 
