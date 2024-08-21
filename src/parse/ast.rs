@@ -1,12 +1,17 @@
 use core::fmt;
-use std::{fmt::Display, mem, ops::Not};
+use std::{
+    fmt::Display,
+    mem,
+    ops::{self, Not},
+};
 
 use itertools::Itertools;
 use tap::TapFallible;
 
 use crate::{
-    ast::{
-        Block, Def, Expr, ExprKind, File, Ident, Item, ItemKind, LetStmt, OpElem, Stmt, StmtKind,
+    ast::parse::{
+        Block, Call, Def, Expr, ExprCallArity, ExprKind, File, Ident, Item, ItemKind, LetStmt,
+        OpElem, Stmt, StmtKind,
     },
     diagnostics::{Diagnostic, Severity, Tag},
     Context, Span, Symbol,
@@ -497,17 +502,21 @@ fn parse_expr_op(ctx: &mut Context, lex: &mut Lexer) -> ParseResult<Expr> {
     let mut cluster = Ok(Vec::new());
 
     let mut span = lex.span();
+    let mut prev_expr = false;
 
     loop {
         let elem = match lex.peek() {
             Some(Ok(&Token::Operator(op))) => {
+                prev_expr = false;
+                let span_op = lex.span();
+                span += span_op;
                 lex.take();
-                span += lex.span();
                 Ok(OpElem::Op(Ident {
                     symbol: op.into(),
-                    span: lex.span(),
+                    span: span_op,
                 }))
             }
+            Some(Ok(Token::LParen)) if prev_expr => parse_call(ctx, lex)?.map(OpElem::Call),
             Some(Ok(tok)) if tok.is_expr_begin() => {
                 if let Ok(t) = parse_expr_term(ctx, lex)? {
                     span += t.span;
@@ -518,6 +527,7 @@ fn parse_expr_op(ctx: &mut Context, lex: &mut Lexer) -> ParseResult<Expr> {
             }
             _ => break,
         };
+        prev_expr = true;
 
         cluster = cluster.and_then(|mut cluster| {
             cluster.push(elem?);
@@ -538,6 +548,62 @@ fn parse_expr_op(ctx: &mut Context, lex: &mut Lexer) -> ParseResult<Expr> {
             }
         }
         Err(ParseError) => Some(Err(ParseError)),
+    }
+}
+
+fn parse_call(ctx: &mut Context, lex: &mut Lexer) -> ParseResult<Call> {
+    let span = lex.span();
+    lex.take();
+
+    let (arity, expr_after) = if let Some(Ok(Token::Operator("->"))) = lex.peek() {
+        let span_arrow = lex.span();
+        lex.take();
+        let arity = match lex.peek() {
+            Some(Ok(&Token::Num(arity))) => {
+                lex.take();
+                Ok(Some(ExprCallArity {
+                    arity: arity as u32,
+                    span: span_arrow + lex.span(),
+                }))
+            }
+            _ => {
+                ctx.emit_diagnostic(lex.make_diagnostic("expected number"));
+                munch_groups_until(ctx, lex, |tok| matches!(tok, Token::Comma));
+                Err(ParseError)
+            }
+        };
+
+        if let Some(Ok(Token::Comma)) = lex.peek() {
+            lex.take();
+            (arity, true)
+        } else {
+            (arity, false)
+        }
+    } else {
+        (Ok(None), true)
+    };
+
+    let arg = if lex.peek().is_none() || !expr_after {
+        Some(Ok(null_expr(ctx, lex)))
+    } else {
+        parse_expr(ctx, lex)
+    };
+
+    expect_closing(ctx, lex, &Token::RParen)
+        .zip(arg)
+        .map(|(closing, arg)| {
+            Ok(Call {
+                arity: arity?,
+                arg: Box::new(arg?),
+                span: span + closing?,
+            })
+        })
+}
+
+fn null_expr(ctx: &mut Context, lex: &mut Lexer) -> Expr {
+    Expr {
+        kind: ExprKind::Comma(Vec::new()),
+        span: (lex.pos()..lex.pos()).into(),
     }
 }
 
@@ -562,8 +628,9 @@ fn parse_expr_term(ctx: &mut Context, lex: &mut Lexer) -> ParseResult<Expr> {
         }
         Some(Ok(Token::LParen)) => {
             lex.take();
+            let expr = parse_expr(ctx, lex);
             expect_closing(ctx, lex, &Token::RParen)
-                .zip(parse_expr(ctx, lex))
+                .zip(expr)
                 .map(|(closing, iota)| closing.and(iota))
         }
         // Some(Ok(Token::LBracket)) => // list expr,
@@ -590,7 +657,7 @@ fn parse_expr_term(ctx: &mut Context, lex: &mut Lexer) -> ParseResult<Expr> {
                     .map(|iota| {
                         iota.map(|iota| Expr {
                             kind: ExprKind::Iota(iota),
-                            span: (span.start..lex.inner().inner().pos()).into(),
+                            span: (span.start..lex.pos()).into(),
                         })
                     })
                 }
@@ -713,10 +780,7 @@ fn parse_stmts(ctx: &mut Context, lex: &mut Lexer) -> ParseResult<(Vec<Stmt>, Ex
                 span,
             }),
             None => {
-                break Ok(Expr {
-                    kind: ExprKind::Comma(Vec::new()),
-                    span: lex.span(),
-                });
+                break Ok(null_expr(ctx, lex));
             }
             _ => {
                 let expr = parse_expr(ctx, lex)?;
@@ -732,6 +796,11 @@ fn parse_stmts(ctx: &mut Context, lex: &mut Lexer) -> ParseResult<(Vec<Stmt>, Ex
                 })()
             }
         };
+
+        stmts = stmts.and_then(|mut stmts| {
+            stmts.push(stmt?);
+            Ok(stmts)
+        })
     };
 
     Some(stmts.and_then(|stmts| Ok((stmts, ret_expr?))))
@@ -750,7 +819,12 @@ mod tests {
         let mut ctx = Context::new();
 
         let str = "
-            def abcd = block (arg1, arg2, ) { 1 + 2; return arg1; };
+            def abcd = block (arg1, arg2, ) {
+                (1 + 2) (-> 2);
+                (1 + 2) (-> 2, 1 + 2);
+                (1 + 2) (1,);
+                return arg1;
+            };
         ";
 
         let mut strlex = StrLex::new(str);

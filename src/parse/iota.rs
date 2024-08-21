@@ -214,13 +214,9 @@ fn parse_iota(ctx: &mut Context, lex: &mut Lexer) -> ParseResult<Iota> {
             parse_list(ctx, lex, &right)
         }
         tok => {
-            let ret = tok.map(|_| Err(ParseError));
-
             ctx.emit_diagnostic(lex.make_diagnostic("expected iota expression"));
-
-            munch_groups_until(ctx, lex, |tok| matches!(tok, Token::Sep))?;
-
-            ret
+            munch_groups_until(ctx, lex, |tok| matches!(tok, Token::Sep));
+            Some(Err(ParseError))
         }
     }
 }
@@ -272,7 +268,7 @@ fn parse_vec(ctx: &mut Context, lex: &mut Lexer) -> ParseResult<Iota> {
 
         ctx.emit_diagnostic(lex.make_diagnostic("expected number"));
 
-        munch_groups_until(ctx, lex, |tok| matches!(tok, Token::Sep))?;
+        munch_groups_until(ctx, lex, |tok| matches!(tok, Token::Sep));
         Some(Err(ParseError))
     }
 
@@ -283,7 +279,7 @@ fn parse_vec(ctx: &mut Context, lex: &mut Lexer) -> ParseResult<Iota> {
         } else {
             ctx.emit_diagnostic(lex.make_diagnostic("expected `,`"));
 
-            munch_groups_until(ctx, lex, |tok| matches!(tok, Token::Sep))?;
+            munch_groups_until(ctx, lex, |tok| matches!(tok, Token::Sep));
             Err(ParseError)
         })
     }

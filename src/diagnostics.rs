@@ -1,4 +1,4 @@
-use std::{borrow::Cow, fmt::Display};
+use std::{backtrace::Backtrace, borrow::Cow, fmt::Display};
 
 use crate::Span;
 
@@ -9,6 +9,7 @@ pub struct Diagnostic {
     pub message: String,
     pub span: Span,
     pub tags: Vec<Tag>,
+    pub backtrace: Backtrace,
 }
 
 impl Diagnostic {
@@ -18,6 +19,7 @@ impl Diagnostic {
             message,
             span: span.into(),
             tags: Vec::new(),
+            backtrace: Backtrace::capture(),
         }
     }
 

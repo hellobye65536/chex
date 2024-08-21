@@ -36,20 +36,12 @@ pub struct Expr {
 
 #[derive(Debug)]
 pub enum ExprKind {
-    Call(ExprCall),
     Comma(Vec<Expr>),
     OpCluster(Vec<OpElem>),
     Iota(Iota),
     Block(Box<Block>),
     Num(f64),
     Var(Ident),
-}
-
-#[derive(Debug)]
-pub struct ExprCall {
-    pub fun: Box<Expr>,
-    pub arg: Box<Expr>,
-    pub arity: Option<ExprCallArity>,
 }
 
 #[derive(Debug)]
@@ -62,6 +54,14 @@ pub struct ExprCallArity {
 pub enum OpElem {
     Op(Ident),
     Term(Expr),
+    Call(Call),
+}
+
+#[derive(Debug)]
+pub struct Call {
+    pub arity: Option<ExprCallArity>,
+    pub arg: Box<Expr>,
+    pub span: Span,
 }
 
 #[derive(Debug)]

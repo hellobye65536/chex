@@ -182,6 +182,7 @@ pub trait SubLexer<'lex, 'str: 'lex, T> {
 pub trait SubLexerExt<'lex, 'str, T> {
     fn peek(&mut self) -> ParseResult<&T>;
     fn take(&mut self) -> ParseResult<T>;
+    fn pos(&self) -> usize;
     fn span(&self) -> Span;
     fn make_diagnostic(&mut self, expected: impl Display + Into<String>) -> Diagnostic;
 }
@@ -198,6 +199,10 @@ where
 
     fn take(&mut self) -> ParseResult<T> {
         self.inner_mut().take()
+    }
+
+    fn pos(&self) -> usize {
+        self.inner().inner().pos()
     }
 
     fn span(&self) -> Span {
@@ -242,7 +247,7 @@ where
     T: GroupingToken + Display,
     L: SubLexer<'lex, 'str, T>,
 {
-    while lex.peek()?.is_ok_and(&mut pred) {
+    while lex.peek()?.is_ok_and(|tok| !pred(tok)) {
         munch_group(ctx, lex)?;
     }
 
