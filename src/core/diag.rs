@@ -1,6 +1,6 @@
 use std::{backtrace::Backtrace, borrow::Cow, fmt::Display};
 
-use crate::Span;
+use crate::core::span::Span;
 
 #[must_use]
 #[derive(Debug)]

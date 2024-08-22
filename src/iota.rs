@@ -5,21 +5,29 @@ use bitvec::{slice::BitSlice, vec::BitVec};
 #[macro_export]
 macro_rules! pattern {
     (BookkeepersGambit: $keep:expr) => {
-        $crate::iota::Pattern::Complex($crate::iota::ComplexPattern::BookkeepersGambit {
-            keep: $keep,
-        })
+        $crate::iota::Pattern::Complex(
+            $crate::iota::ComplexPattern::BookkeepersGambit {
+                keep: $keep,
+            }
+        )
     };
     (NumericalReflection: $num:expr) => {
-        $crate::iota::Pattern::Complex($crate::iota::ComplexPattern::NumericalReflection($num))
+        $crate::iota::Pattern::Complex(
+            $crate::iota::ComplexPattern::NumericalReflection($num)
+        )
     };
     (HexPattern ($dir:expr, $angles:expr)) => {
-        $crate::iota::Pattern::Complex($crate::iota::ComplexPattern::Other {
-            dir: $dir,
-            angles: $angles,
-        })
+        $crate::iota::Pattern::Complex(
+            $crate::iota::ComplexPattern::Other {
+                dir: $dir,
+                angles: $angles,
+            }
+        )
     };
     ($ident:ident) => {
-        $crate::iota::Pattern::Simple($crate::iota::SimplePattern::$ident)
+        $crate::iota::Pattern::Simple(
+            $crate::iota::SimplePattern::$ident
+        )
     };
 }
 

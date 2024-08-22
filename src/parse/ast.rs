@@ -1,6 +1,5 @@
-use core::fmt;
 use std::{
-    fmt::Display,
+    fmt::{self, Display},
     mem,
     ops::{self, Not},
 };
@@ -10,11 +9,11 @@ use tap::TapFallible;
 
 use crate::{
     ast::parse::{
-        Block, Call, Def, Expr, ExprCallArity, ExprKind, File, Ident, Item, ItemKind, LetStmt,
-        OpElem, Stmt, StmtKind,
+        Block, Call, CallArity, Def, Expr, ExprKind, File, Ident, Item, ItemKind, LetStmt, OpElem,
+        Stmt, StmtKind,
     },
-    diagnostics::{Diagnostic, Severity, Tag},
-    Context, Span, Symbol,
+    core::{Context, Diagnostic, Severity, Span, Tag},
+    Symbol,
 };
 
 use super::{
@@ -561,7 +560,7 @@ fn parse_call(ctx: &mut Context, lex: &mut Lexer) -> ParseResult<Call> {
         let arity = match lex.peek() {
             Some(Ok(&Token::Num(arity))) => {
                 lex.take();
-                Ok(Some(ExprCallArity {
+                Ok(Some(CallArity {
                     arity: arity as u32,
                     span: span_arrow + lex.span(),
                 }))
@@ -809,8 +808,8 @@ fn parse_stmts(ctx: &mut Context, lex: &mut Lexer) -> ParseResult<(Vec<Stmt>, Ex
 #[cfg(test)]
 mod tests {
     use crate::{
+        core::Context,
         parse::{Lexer, StrLex, SubLexer, SubLexerExt},
-        Context,
     };
 
     #[test]

@@ -12,10 +12,10 @@ use itertools::Itertools;
 use tap::TapOptional;
 
 use crate::{
-    diagnostics::{Diagnostic, Severity, Tag},
+    core::{Context, Diagnostic, Severity, Span, Tag},
     iota::{bytes_as_angles, Angle, ComplexPattern, Direction, Iota, Pattern, SimplePattern},
     parse::{LexResult, ParseError, ParseResult, StrLex},
-    pattern, Context, Span,
+    pattern,
 };
 
 use super::{
@@ -524,7 +524,7 @@ fn parse_bookkeepers_gambit(ctx: &mut Context, lex: &mut Lexer) -> ParseResult<I
 mod tests {
     use crate::{
         parse::{LexResult, StrLex},
-        Context,
+        core::Context,
     };
 
     use super::{lex_default, parse_iota, pattern_parse_table, Lexer, Token};

@@ -1,4 +1,4 @@
-use crate::{iota::Iota, Span, Symbol};
+use crate::{core::Span, iota::Iota, Symbol};
 
 #[derive(Debug)]
 pub struct Ident {
@@ -45,12 +45,6 @@ pub enum ExprKind {
 }
 
 #[derive(Debug)]
-pub struct ExprCallArity {
-    pub arity: u32,
-    pub span: Span,
-}
-
-#[derive(Debug)]
 pub enum OpElem {
     Op(Ident),
     Term(Expr),
@@ -59,8 +53,14 @@ pub enum OpElem {
 
 #[derive(Debug)]
 pub struct Call {
-    pub arity: Option<ExprCallArity>,
+    pub arity: Option<CallArity>,
     pub arg: Box<Expr>,
+    pub span: Span,
+}
+
+#[derive(Debug)]
+pub struct CallArity {
+    pub arity: u32,
     pub span: Span,
 }
 

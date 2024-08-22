@@ -3,8 +3,9 @@ use std::iter;
 use itertools::Itertools;
 
 use crate::{
+    core::{Id, IdGen, IdMap},
     iota::{Iota, Pattern},
-    pattern, patterns, Id, IdGen, IdMap, UsizeToU8,
+    pattern, patterns, UsizeToU8,
 };
 
 mod emit;

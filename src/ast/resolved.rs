@@ -1,93 +1,82 @@
-use crate::{iota::Iota, Span, Symbol};
+use crate::{
+    core::{FileSpan, Id, Span},
+    iota::Iota,
+    Symbol,
+};
 
 #[derive(Debug)]
-pub struct Ident {
-    pub symbol: Symbol,
-    pub span: Span,
+pub struct Unit {
+    pub defs: Vec<Def>,
 }
 
-#[derive(Debug)]
-pub struct File {
-    pub items: Vec<Item>,
-}
+type OFSpan = Option<FileSpan>;
 
-#[derive(Debug)]
-pub struct Item {
-    pub kind: ItemKind,
-    pub span: Span,
-}
+pub enum DefTag {}
+pub type DefId = Id<DefTag>;
 
-#[derive(Debug)]
-pub enum ItemKind {
-    Def(Def),
-}
+pub enum LetTag {}
+pub type LetId = Id<LetTag>;
 
 #[derive(Debug)]
 pub struct Def {
-    pub ident: Ident,
+    pub id: DefId,
     pub expr: Expr,
+    pub span: OFSpan,
 }
 
 #[derive(Debug)]
 pub struct Expr {
     pub kind: ExprKind,
-    pub span: Span,
+    pub span: OFSpan,
 }
 
 #[derive(Debug)]
 pub enum ExprKind {
     Comma(Vec<Expr>),
-    OpCluster(Vec<OpElem>),
     Iota(Iota),
     Block(Box<Block>),
     Num(f64),
-    Var(Ident),
-}
-
-#[derive(Debug)]
-pub struct ExprCallArity {
-    pub arity: u32,
-    pub span: Span,
-}
-
-#[derive(Debug)]
-pub enum OpElem {
-    Op(Ident),
-    Term(Expr),
+    Def(DefId),
+    Let(LetId),
     Call(Call),
 }
 
 #[derive(Debug)]
+pub struct CallArity {
+    pub arity: u32,
+    pub span: OFSpan,
+}
+
+#[derive(Debug)]
 pub struct Call {
-    pub arity: Option<ExprCallArity>,
+    pub fun: Box<Expr>,
+    pub arity: Option<CallArity>,
     pub arg: Box<Expr>,
-    pub span: Span,
+    pub span: OFSpan,
 }
 
 #[derive(Debug)]
 pub struct Block {
-    pub args: Vec<Ident>,
+    pub args: Vec<(LetId, OFSpan)>,
     pub stmts: Vec<Stmt>,
     pub ret: Expr,
-    pub span: Span,
+    pub span: OFSpan,
 }
 
 #[derive(Debug)]
 pub struct Stmt {
     pub kind: StmtKind,
-    pub span: Span,
+    pub span: OFSpan,
 }
 
 #[derive(Debug)]
 pub enum StmtKind {
-    Let(LetStmt),
-    Def(Def),
+    Let(Let),
     Expr(Expr),
-    // Include(_),
 }
 
 #[derive(Debug)]
-pub struct LetStmt {
-    pub bindings: Vec<Ident>,
+pub struct Let {
+    pub bindings: Vec<(LetId, OFSpan)>,
     pub arg: Box<Expr>,
 }

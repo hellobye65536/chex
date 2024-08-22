@@ -1,9 +1,6 @@
 use std::{cell::Cell, fmt::Display, mem};
 
-use crate::{
-    diagnostics::{Diagnostic, Severity},
-    Context, Span,
-};
+use crate::core::{Context, Diagnostic, Severity, Span};
 
 pub mod ast;
 pub mod iota;
@@ -124,6 +121,7 @@ impl<'lex, 'str, Token> Lexer<'lex, 'str, Token> {
 
         self.peek = self.peek.take().or_else(|| {
             if let Some(res) = lex_fn(self.strlex) {
+                self.fuel.set(REFUEL);
                 self.span = res.span;
                 Some(res.token)
             } else {
@@ -138,7 +136,6 @@ impl<'lex, 'str, Token> Lexer<'lex, 'str, Token> {
     }
 
     pub fn take(&mut self) -> ParseResult<Token> {
-        self.fuel.set(REFUEL);
         self.peek.take()
     }
 
@@ -146,16 +143,10 @@ impl<'lex, 'str, Token> Lexer<'lex, 'str, Token> {
         self.span
     }
 
-    // pub fn skip_while<F, P>(&mut self, lex: F, mut pred: P)
-    // where
-    //     F: FnOnce(&mut StrLex<'str>) -> Option<LexResult<Token>>,
-    //     P: FnMut(&Token) -> bool,
-    // {
-    // }
-
     pub fn inner(&self) -> &StrLex<'str> {
         self.strlex
     }
+
     pub fn inner_mut(&mut self) -> &mut StrLex<'str> {
         debug_assert!(self.peek.is_none());
         self.strlex
@@ -219,6 +210,10 @@ where
         Diagnostic::new(Severity::Error, message, self.span())
             .with_primary_tag(Some(expected.into()))
     }
+}
+
+pub struct ParseCtx {
+
 }
 
 #[must_use]
