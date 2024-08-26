@@ -1,6 +1,6 @@
 use std::{cell::Cell, fmt::Display, mem};
 
-use crate::core::{Context, Diagnostic, Severity, Span};
+use crate::core::{Context, Diagnostic, FileId, FileSpan, Severity, Span};
 
 pub mod ast;
 pub mod iota;
@@ -90,8 +90,8 @@ impl<T> LexResult<T> {
 }
 
 #[derive(Debug)]
-pub struct Lexer<'lex, 'str, Token> {
-    strlex: &'lex mut StrLex<'str>,
+pub struct Lexer<'p, 'str, Token> {
+    strlex: &'p mut StrLex<'str>,
     span: Span,
     peek: Option<Result<Token, ParseError>>,
     fuel: Cell<u32>,
@@ -139,6 +139,14 @@ impl<'lex, 'str, Token> Lexer<'lex, 'str, Token> {
         self.peek.take()
     }
 
+    pub fn pos(&self) -> usize {
+        if self.peek.is_some() {
+            self.span.start()
+        } else {
+            self.strlex.pos()
+        }
+    }
+
     pub fn span(&self) -> Span {
         self.span
     }
@@ -163,69 +171,134 @@ pub trait GroupingToken: Sized {
     fn matching(&self) -> Option<Self>;
 }
 
-pub trait SubLexer<'lex, 'str: 'lex, T> {
-    fn inner(&self) -> &Lexer<'lex, 'str, T>;
-    fn inner_mut(&mut self) -> &mut Lexer<'lex, 'str, T>;
-
-    fn peek_closing(&mut self) -> ParseResult<&T>;
+pub trait LexFn<'str> {
+    type Token;
+    fn lex(&mut self, strlex: &mut StrLex<'str>) -> Option<LexResult<Self::Token>>;
 }
 
-pub trait SubLexerExt<'lex, 'str, T> {
-    fn peek(&mut self) -> ParseResult<&T>;
-    fn take(&mut self) -> ParseResult<T>;
-    fn pos(&self) -> usize;
-    fn span(&self) -> Span;
-    fn make_diagnostic(&mut self, expected: impl Display + Into<String>) -> Diagnostic;
+impl<'str, T: LexFn<'str>> LexFn<'str> for &mut T {
+    type Token = T::Token;
+
+    fn lex(&mut self, strlex: &mut StrLex<'str>) -> Option<LexResult<Self::Token>> {
+        <T as LexFn<'str>>::lex(self, strlex)
+    }
 }
 
-impl<'lex, 'str: 'lex, T, L> SubLexerExt<'lex, 'str, T> for L
+#[derive(Debug)]
+pub struct ParseContext<'p, 'str, T, F> {
+    pub ctx: &'p mut Context,
+    pub file: FileId,
+    pub lex_state: Lexer<'p, 'str, T>,
+    pub lex_fn: F,
+}
+
+impl<'p, 'str, T> ParseContext<'p, 'str, T, ()> {
+    pub fn new(ctx: &'p mut Context, file: FileId, strlex: &'p mut StrLex<'str>) -> Self {
+        Self {
+            ctx,
+            file,
+            lex_state: Lexer::new(strlex),
+            lex_fn: (),
+        }
+    }
+}
+
+impl<'p, 'str, T, F> ParseContext<'p, 'str, T, F> {
+    pub fn change_token<NT>(&mut self) -> ParseContext<'_, 'str, NT, ()> {
+        assert!(self.lex_state.peek.is_none());
+        ParseContext {
+            ctx: self.ctx,
+            file: self.file,
+            lex_state: Lexer::new(self.lex_state.inner_mut()),
+            lex_fn: (),
+        }
+    }
+
+    pub fn with_lex_fn<NF>(self, lex_fn: NF) -> ParseContext<'p, 'str, T, NF> {
+        ParseContext {
+            ctx: self.ctx,
+            file: self.file,
+            lex_state: self.lex_state,
+            lex_fn,
+        }
+    }
+
+    pub fn emit_diagnostic(&mut self, diagnostic: Diagnostic) {
+        self.ctx.emit_diagnostic(diagnostic)
+    }
+
+    pub fn peek_fn<'s, NF>(&'s mut self, lex_fn: &mut NF) -> ParseResult<&'s T>
+    where
+        NF: LexFn<'str, Token = T>,
+    {
+        self.lex_state.peek(|strlex| lex_fn.lex(strlex))
+    }
+
+    pub fn take(&mut self) -> ParseResult<T> {
+        self.lex_state.take()
+    }
+
+    pub fn pos(&self) -> usize {
+        self.lex_state.pos()
+    }
+
+    pub fn file(&self) -> FileId {
+        self.file
+    }
+
+    pub fn span(&self) -> Span {
+        self.lex_state.span()
+    }
+
+    pub fn file_span(&self) -> FileSpan {
+        (self.file(), self.span()).into()
+    }
+}
+
+impl<'p, 'str, T, F> ParseContext<'p, 'str, T, F>
 where
-    T: GroupingToken + Display,
-    L: SubLexer<'lex, 'str, T>,
+    F: LexFn<'str, Token = T>,
+    T: GroupingToken,
 {
-    fn peek(&mut self) -> ParseResult<&T> {
+    pub fn peek(&mut self) -> ParseResult<&T> {
         self.peek_closing()
             .filter(|v| !v.is_ok_and(|v| v.left_matching().is_some()))
     }
 
-    fn take(&mut self) -> ParseResult<T> {
-        self.inner_mut().take()
+    pub fn peek_closing(&mut self) -> ParseResult<&T> {
+        self.lex_state.peek(|strlex| self.lex_fn.lex(strlex))
     }
+}
 
-    fn pos(&self) -> usize {
-        self.inner().inner().pos()
-    }
-
-    fn span(&self) -> Span {
-        self.inner().span()
-    }
-
-    fn make_diagnostic(&mut self, expected: impl Display + Into<String>) -> Diagnostic {
-        let message = match self.inner().peek.as_ref() {
+impl<'p, 'str, T, F> ParseContext<'p, 'str, T, F>
+where
+    F: LexFn<'str, Token = T>,
+    T: GroupingToken + Display,
+{
+    pub fn parse_diagnostic(&mut self, expected: impl Display + Into<String>) {
+        let message = match self.lex_state.peek.as_ref() {
             Some(Ok(t)) => format!("{}, got {}", expected, t),
             Some(Err(_)) => format!("{}, got invalid token", expected),
             None => format!("{}, got eof", expected),
         };
 
-        Diagnostic::new(Severity::Error, message, self.span())
-            .with_primary_tag(Some(expected.into()))
+        self.emit_diagnostic(
+            Diagnostic::new(Severity::Error, message, (self.file, self.span()))
+                .with_primary_tag(Some(expected.into())),
+        )
     }
 }
 
-pub struct ParseCtx {
-
-}
-
 #[must_use]
-fn munch_group<'lex, 'str: 'lex, T, L>(ctx: &mut Context, lex: &mut L) -> Option<()>
+fn munch_group<'str, T, F>(ctx: &mut ParseContext<'_, 'str, T, F>) -> Option<()>
 where
+    F: LexFn<'str, Token = T>,
     T: GroupingToken + Display,
-    L: SubLexer<'lex, 'str, T>,
 {
-    lex.peek()?;
-    if let Ok(tok) = lex.take()? {
+    ctx.peek()?;
+    if let Ok(tok) = ctx.take()? {
         if let Some(matching) = tok.right_matching() {
-            return expect_closing(ctx, lex, &matching).map(|_| ());
+            return expect_closing(ctx, &matching).map(|_| ());
         }
     }
 
@@ -233,79 +306,76 @@ where
 }
 
 #[must_use]
-fn munch_groups_until<'lex, 'str: 'lex, T, L>(
-    ctx: &mut Context,
-    lex: &mut L,
+fn munch_groups_until<'str, T, F>(
+    ctx: &mut ParseContext<'_, 'str, T, F>,
     mut pred: impl FnMut(&T) -> bool,
 ) -> Option<()>
 where
+    F: LexFn<'str, Token = T>,
     T: GroupingToken + Display,
-    L: SubLexer<'lex, 'str, T>,
 {
-    while lex.peek()?.is_ok_and(|tok| !pred(tok)) {
-        munch_group(ctx, lex)?;
+    while ctx.peek()?.is_ok_and(|tok| !pred(tok)) {
+        munch_group(ctx)?;
     }
 
     Some(())
 }
 
 #[must_use]
-fn expect_closing<'lex, 'str: 'lex, T, L>(
-    ctx: &mut Context,
-    lex: &mut L,
+fn expect_closing<'str, T, F>(
+    ctx: &mut ParseContext<'_, 'str, T, F>,
     right: &T,
 ) -> ParseResult<Span>
 where
+    F: LexFn<'str, Token = T>,
     T: GroupingToken + Display,
-    L: SubLexer<'lex, 'str, T>,
 {
-    expect_closing_ext(ctx, lex, right, false)
+    expect_closing_ext(ctx, right, false)
 }
 
 #[must_use]
-fn expect_closing_ext<'lex, 'str: 'lex, T, L>(
-    ctx: &mut Context,
-    lex: &mut L,
+fn expect_closing_ext<'str, T, F>(
+    ctx: &mut ParseContext<'_, 'str, T, F>,
     right: &T,
     skip_only: bool,
 ) -> ParseResult<Span>
 where
+    F: LexFn<'str, Token = T>,
     T: GroupingToken + Display,
-    L: SubLexer<'lex, 'str, T>,
 {
     debug_assert!(right.left_matching().is_some());
 
-    if let Ok(tok) = lex.peek_closing()? {
+    if let Ok(tok) = ctx.peek_closing()? {
         if mem::discriminant(tok) == mem::discriminant(right) {
-            lex.take();
-            return Some(Ok(lex.span()));
+            ctx.take();
+            return Some(Ok(ctx.span()));
         } else if tok.left_matching().is_some() {
-            ctx.emit_diagnostic(lex.make_diagnostic(format!("expected {}", right)));
+            ctx.parse_diagnostic(format!("expected {}", right));
             return None;
         }
     }
 
     if !skip_only {
-        ctx.emit_diagnostic(lex.make_diagnostic(format!("expected {}", right)));
+        ctx.parse_diagnostic(format!("expected {}", right));
     }
 
     loop {
-        let Ok(tok) = lex.peek_closing()? else {
-            lex.take();
+        let Ok(tok) = ctx.peek_closing()? else {
+            ctx.take();
             continue;
         };
 
         if mem::discriminant(tok) == mem::discriminant(right) {
-            lex.take();
+            ctx.take();
             return Some(Err(ParseError));
         } else if tok.left_matching().is_some() {
-            ctx.emit_diagnostic(lex.make_diagnostic(format!("missing closing {}", right)));
+            ctx.parse_diagnostic(format!("missing closing {}", right));
             return None;
         } else if let Some(matching) = tok.right_matching() {
-            lex.take();
-            expect_closing_ext(ctx, lex, &matching, true)?;
+            ctx.take();
+            expect_closing_ext(ctx, &matching, true)?;
         } else {
-            lex.take();
+            ctx.take();
         }
     }
 }

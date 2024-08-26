@@ -1,19 +1,19 @@
 use std::{backtrace::Backtrace, borrow::Cow, fmt::Display};
 
-use crate::core::span::Span;
+use crate::core::span::FileSpan;
 
 #[must_use]
 #[derive(Debug)]
 pub struct Diagnostic {
     pub severity: Severity,
     pub message: String,
-    pub span: Span,
+    pub span: FileSpan,
     pub tags: Vec<Tag>,
     pub backtrace: Backtrace,
 }
 
 impl Diagnostic {
-    pub fn new(severity: Severity, message: String, span: impl Into<Span>) -> Self {
+    pub fn new(severity: Severity, message: String, span: impl Into<FileSpan>) -> Self {
         Self {
             severity,
             message,
@@ -48,11 +48,11 @@ impl Diagnostic {
 pub struct Tag {
     pub severity: Severity,
     pub message: String,
-    pub span: Span,
+    pub span: FileSpan,
 }
 
 impl Tag {
-    pub fn new(severity: Severity, message: String, span: impl Into<Span>) -> Self {
+    pub fn new(severity: Severity, message: String, span: impl Into<FileSpan>) -> Self {
         Self {
             severity,
             message,
